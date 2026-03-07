@@ -1,75 +1,146 @@
 import streamlit as st
 
+# Importar vistas
 from vistas import login
 from vistas import registro
 from vistas import estudiante
 from vistas import docente
 from vistas import admin
 
+from vistas.estilos import aplicar_estilos
+from vistas.estilos import barra_lateral
+
+
+# ------------------------
+# Configuración página
+# ------------------------
 
 st.set_page_config(
 
-page_title="Tutores 4.0",
-
-layout="wide"
-
-)
-
-
-# LOGO
-
-st.sidebar.image(
-
-"imagenes/logo.png",
-
-width=150
+    page_title="Sistema de Tutorías",
+    layout="centered"
 
 )
 
 
-st.sidebar.title("Tutores 4.0")
+# ------------------------
+# Estilos
+# ------------------------
+
+aplicar_estilos()
+barra_lateral()
 
 
-menu = st.sidebar.selectbox(
+# ------------------------
+# Variables sesión
+# ------------------------
 
-"Menú",
+if "rol" not in st.session_state:
+    st.session_state["rol"] = None
 
-[
-"Login",
-"Registro",
-"Estudiante",
-"Docente",
-"Administrador"
-]
+if "usuario" not in st.session_state:
+    st.session_state["usuario"] = ""
 
-)
-
+if "pagina" not in st.session_state:
+    st.session_state["pagina"] = "login"
 
 
-if menu == "Login":
+# ------------------------
+# SIN LOGIN
+# ------------------------
 
- login.mostrar()
-
-
-
-if menu == "Registro":
-
- registro.mostrar()
+if st.session_state["rol"] == None:
 
 
+    if st.session_state["pagina"] == "login":
 
-if menu == "Estudiante":
-
- estudiante.mostrar()
-
+        login.mostrar()
 
 
-if menu == "Docente":
+    elif st.session_state["pagina"] == "registro":
 
- docente.mostrar()
+        registro.mostrar()
 
 
 
-if menu == "Administrador":
+# ------------------------
+# ESTUDIANTE
+# ------------------------
 
- admin.mostrar()
+elif st.session_state["rol"] == "Estudiante":
+
+    st.sidebar.title("Panel Estudiante")
+
+    st.sidebar.write(
+        "Usuario:",
+        st.session_state["usuario"]
+    )
+
+    st.sidebar.write("")
+
+    if st.sidebar.button("Cerrar sesión"):
+
+        st.session_state["rol"] = None
+        st.session_state["usuario"] = ""
+        st.session_state["pagina"] = "login"
+
+        st.rerun()
+
+
+    estudiante.mostrar()
+
+
+
+# ------------------------
+# DOCENTE
+# ------------------------
+
+elif st.session_state["rol"] == "Docente":
+
+    st.sidebar.title("Panel Docente")
+
+    st.sidebar.write(
+        "Usuario:",
+        st.session_state["usuario"]
+    )
+
+    st.sidebar.write("")
+
+    if st.sidebar.button("Cerrar sesión"):
+
+        st.session_state["rol"] = None
+        st.session_state["usuario"] = ""
+        st.session_state["pagina"] = "login"
+
+        st.rerun()
+
+
+    docente.mostrar()
+
+
+
+# ------------------------
+# ADMIN
+# ------------------------
+
+elif st.session_state["rol"] == "Admin":
+
+    st.sidebar.title("Panel Admin")
+
+    st.sidebar.write(
+        "Usuario:",
+        st.session_state["usuario"]
+    )
+
+    st.sidebar.write("")
+
+    if st.sidebar.button("Cerrar sesión"):
+
+        st.session_state["rol"] = None
+        st.session_state["usuario"] = ""
+        st.session_state["pagina"] = "login"
+
+        st.rerun()
+
+
+    admin.mostrar()
