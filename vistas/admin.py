@@ -1,4 +1,3 @@
-admin.py
 import streamlit as st
 from vistas.estilos import aplicar_estilos
 
