@@ -1,34 +1,175 @@
 import streamlit as st
-from vistas.estilos import aplicar_estilos
+import pandas as pd
+from database import conectar
+
 
 def mostrar():
 
-    aplicar_estilos()
-
     st.title("Panel Estudiante")
 
-    st.write("")
 
-    st.subheader("Tutorías disponibles")
+    # =========================
+    # SOLICITAR TUTORIA
+    # =========================
 
-    st.write("Matemáticas")
-    st.write("Programación")
-    st.write("Física")
-
-    st.write("")
-
-    if st.button("Reservar"):
-
-        st.success("Tutoría reservada")
+    st.subheader("Solicitar Tutoría")
 
 
-    st.write("")
+    materia = st.text_input("Materia")
 
 
-    st.subheader("Mis reservas")
+    # -------------------------
+    # Obtener docentes
+    # -------------------------
 
-    st.write("Matemáticas")
+    conexion = conectar()
 
-    if st.button("Cancelar"):
+    cursor = conexion.cursor()
 
-        st.warning("Tutoría cancelada")
+    cursor.execute(
+
+    """
+
+    SELECT nombre
+
+    FROM usuarios
+
+    WHERE rol='docente'
+
+    """
+
+    )
+
+    docentes = cursor.fetchall()
+
+    conexion.close()
+
+
+    lista_docentes = []
+
+    for d in docentes:
+
+        lista_docentes.append(d[0])
+
+
+    # Selector de docentes
+
+    docente = st.selectbox(
+
+        "Docente",
+
+        lista_docentes
+
+    )
+
+
+    fecha = st.date_input("Fecha")
+
+
+    # -------------------------
+    # Botón solicitar
+    # -------------------------
+
+    if st.button("Solicitar Tutoría"):
+
+
+        if materia == "":
+
+            st.warning("Ingrese la materia")
+
+
+        else:
+
+            conexion = conectar()
+
+            cursor = conexion.cursor()
+
+
+            sql = """
+
+            INSERT INTO tutorias
+
+            (estudiante,docente,materia,fecha,estado)
+
+            VALUES(%s,%s,%s,%s,%s)
+
+            """
+
+
+            datos = (
+
+            st.session_state["usuario"],
+
+            docente,
+
+            materia,
+
+            fecha,
+
+            "Pendiente"
+
+            )
+
+
+            cursor.execute(sql,datos)
+
+            conexion.commit()
+
+            conexion.close()
+
+
+            st.success("Tutoría solicitada")
+
+            st.rerun()
+
+
+
+    # =========================
+    # MIS TUTORIAS
+    # =========================
+
+    st.subheader("Mis Tutorías")
+
+
+    conexion = conectar()
+
+
+    query = """
+
+    SELECT
+
+    id,
+    docente,
+    materia,
+    fecha,
+    estado
+
+    FROM tutorias
+
+    WHERE estudiante=%s
+
+    """
+
+
+    df = pd.read_sql(
+
+        query,
+
+        conexion,
+
+        params=(st.session_state["usuario"],)
+
+    )
+
+
+    conexion.close()
+
+
+    if len(df) == 0:
+
+        st.info("No tienes tutorías")
+
+
+    else:
+
+        st.dataframe(df)
