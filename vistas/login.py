@@ -1,41 +1,72 @@
 import streamlit as st
+from database import conectar
 from vistas.estilos import aplicar_estilos
+
+
 
 def mostrar():
 
     aplicar_estilos()
+    
 
-    st.markdown(
-    '<div class="titulo">Sistema Tutores 4.0</div>',
-    unsafe_allow_html=True)
+    # Centrar contenido
+    col1, col2, col3 = st.columns([1,2,1])
 
-    st.markdown(
-    '<div class="subtitulo">Inicio de Sesión</div>',
-    unsafe_allow_html=True)
+    with col2:
 
-    st.write("")
+        st.title("Login")
 
-    correo = st.text_input("Correo")
+        correo = st.text_input("Correo")
 
-    password = st.text_input(
-        "Contraseña",
-        type="password"
-    )
+        password = st.text_input(
+            "Contraseña",
+            type="password"
+        )
 
-    rol = st.selectbox(
+        st.write("")
 
-    "Rol",
+        colA, colB = st.columns(2)
 
-    [
-    "Estudiante",
-    "Docente",
-    "Administrador"
-    ]
+        # BOTON LOGIN
+        with colA:
 
-    )
+            if st.button("Ingresar"):
 
-    st.write("")
+                conexion = conectar()
+                cursor = conexion.cursor()
 
-    if st.button("Ingresar"):
+                sql = """
+                SELECT * FROM usuarios
+                WHERE correo=%s AND password=%s
+                """
 
-        st.success("Ingreso correcto")
+                datos = (correo, password)
+
+                cursor.execute(sql, datos)
+
+                usuario = cursor.fetchone()
+
+                conexion.close()
+
+                if usuario:
+
+                    st.success("Bienvenido " + usuario[1])
+
+                    st.session_state["usuario"] = usuario[1]
+                    st.session_state["rol"] = usuario[4]
+
+                    st.rerun()
+
+                else:
+
+                    st.error("Correo o contraseña incorrectos")
+
+
+        # BOTON REGISTRO
+        with colB:
+
+            if st.button("Registrarse"):
+
+                st.session_state["pagina"] = "registro"
+
+                st.rerun()
