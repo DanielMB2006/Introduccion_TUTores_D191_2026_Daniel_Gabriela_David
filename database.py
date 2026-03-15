@@ -1,16 +1,15 @@
 import mysql.connector
 
+
 def conectar():
 
     conexion = mysql.connector.connect(
 
-        host="localhost",
-
+        host="shuttle.proxy.rlwy.net",
         user="root",
-
-        password="",
-
-        database="tutores"
+        password="PPnGRnTDgWNuxNutJLMZnRMHzPPGJhVU",
+        database="railway",
+        port=26574
 
     )
 
