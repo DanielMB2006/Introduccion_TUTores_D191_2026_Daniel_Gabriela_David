@@ -1,4 +1,5 @@
 import streamlit as st
+import os
 
 
 def aplicar_estilos():
@@ -77,20 +78,12 @@ def aplicar_estilos():
 
 
 def mostrar_logo():
-
-    st.sidebar.image(
-
-        "imagenes/logo.png",
-
-        width=150
-
-    )
-
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    logo_path = os.path.join(base_dir, "..", "imagenes", "logo.PNG")
+    
+    st.sidebar.image(logo_path, width=150)
 
 def barra_lateral():
-
     mostrar_logo()
-
     st.sidebar.markdown("---")
-
     st.sidebar.write("Sistema de Tutorías")
