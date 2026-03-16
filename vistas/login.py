@@ -14,7 +14,7 @@ def mostrar():
 
     with col2:
 
-        st.title("Login")
+        st.title("Inicia Sesion")
 
         correo = st.text_input("Correo")
 
